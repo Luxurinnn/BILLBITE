@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Makanan | FJ BILLIARD</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #080811;
+            --panel: #10101c;
+            --border: #29283e;
+            --text: #f0efff;
+            --muted: #969bb8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 245px minmax(0, 1fr);
+        }
+
+        .sidebar {
+            background: #0b0b15;
+            border-right: 1px solid var(--border);
+            padding: 25px 17px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #a78bfa, #5525cc);
+            font-size: 22px;
+            font-weight: 800;
+            font-style: italic;
+            color: #fff;
+        }
+
+        .brand strong {
+            display: block;
+            letter-spacing: 2px;
+            font-size: 13px;
+        }
+
+        .brand small {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: #747995;
+            letter-spacing: 2px;
+            padding: 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav button,
+        .nav a {
+            width: 100%;
+            background: transparent;
+            border: 0;
+            text-align: left;
+        }
+
+        .nav button {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #aeb3ce;
+            cursor: pointer;
+            font-size: 12px;
+            transition: .2s;
+        }
+
+        .nav button .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .nav button:hover {
+            background: #ffffff07;
+            color: white;
+        }
+
+        .nav button.active {
+            background: linear-gradient(100deg, #7c3aed32, #7c3aed0a);
+            border-color: #8b5cf644;
+            color: #c4b5fd;
+        }
+
+        .main {
+            min-width: 0;
+            padding: 28px 32px 38px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .crumb {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 25px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .welcome {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .panel-head {
+            margin-bottom: 18px;
+        }
+
+        .panel-head h2 {
+            font-size: 14px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .panel-head p {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th {
+            text-align: left;
+            font-size: 10px;
+            font-weight: 500;
+            color: #8389a7;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            font-size: 11px;
+            color: #d8d9eb;
+            padding: 14px 10px;
+            border-bottom: 1px solid #242337;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: #8b5cf61c;
+            color: #c4b5fd;
+            display: inline-block;
+        }
+
+        .badge.out {
+            background: #fb71851a;
+            color: #fda4af;
+        }
+
+        .empty-note {
+            color: var(--muted);
+            font-size: 12px;
+            padding: 30px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body data-user-name="{{ nama }}" data-user-role="{{ role }}">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">FJ</div>
+                <div><strong>FJ BILLIARD</strong><small>MANAGEMENT SYSTEM</small></div>
+            </div>
+            <div>
+                <div class="nav-label">MENU UTAMA</div>
+                <nav class="nav">
+                    <a href="/dashboard"><button><span class="nav-icon">▦</span>Dashboard</button></a>
+                    <a href="/meja"><button><span class="nav-icon">▤</span>Meja Billiard</button></a>
+                    <a href="/booking"><button><span class="nav-icon">▣</span>Booking</button></a>
+                    <a href="/pesanan"><button><span class="nav-icon">♨</span>Pesanan</button></a>
+                    <a href="/transaksi"><button><span class="nav-icon">↗</span>Transaksi</button></a>
+                    <a href="/menu"><button class="active"><span class="nav-icon">☷</span>Menu Makanan</button></a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <div class="crumb">FJ BILLIARD / Menu Makanan</div>
+                    <h1>Menu Makanan & Minuman</h1>
+                    <p class="welcome">Daftar item hidangan yang tersedia.</p>
+                </div>
+            </header>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>Katalog Menu</h2>
+                    <p>Daftar produk dan ketersediaan stok</p>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NAMA MENU</th>
+                                <th>KATEGORI</th>
+                                <th>HARGA</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if menu_items %}
+                            {% for item in menu_items %}
+                            <tr>
+                                <td><strong>{{ item['name'] }}</strong></td>
+                                <td>{{ item['category'] }}</td>
+                                <td>Rp {{ "{:,}".format(item['price'] or 0).replace(',', '.') }}</td>
+                                <td>
+                                    <span class="badge {{ 'out' if not item['is_available'] else '' }}">
+                                        {{ 'Tersedia' if item['is_available'] else 'Habis' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4">
+                                    <p class="empty-note">Belum ada item menu terdaftar.</p>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

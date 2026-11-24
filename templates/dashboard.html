@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | FJ BILLIARD</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg: #080811;
+      --panel: #10101c;
+      --panel2: #141421;
+      --border: #29283e;
+      --purple: #9561ff;
+      --purple2: #5c2bd8;
+      --text: #f0efff;
+      --muted: #969bb8;
+      --green: #a78bfa;
+      --red: #fb7185;
+      --yellow: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', Arial, sans-serif;
+      margin: 0;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 245px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #0b0b15;
+      border-right: 1px solid var(--border);
+      padding: 25px 17px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 10px;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #a78bfa, #5525cc);
+      font-size: 22px;
+      font-weight: 800;
+      font-style: italic;
+      box-shadow: 0 5px 22px #7c3aed44;
+      color: #fff;
+    }
+
+    .brand strong {
+      display: block;
+      letter-spacing: 2px;
+      font-size: 13px;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: 2px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      color: #747995;
+      letter-spacing: 2px;
+      padding: 0 12px;
+      margin-bottom: 10px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav button,
+    .nav a {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      text-align: left;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #aeb3ce;
+      cursor: pointer;
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .nav button .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .nav button:hover {
+      background: #ffffff07;
+      color: white;
+    }
+
+    .nav button.active {
+      background: linear-gradient(100deg, #7c3aed32, #7c3aed0a);
+      border-color: #8b5cf644;
+      color: #c4b5fd;
+    }
+
+    .side-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .help-card {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: linear-gradient(145deg, #171326, #0e0d19);
+    }
+
+    .help-card strong {
+      font-size: 12px;
+    }
+
+    .help-card p {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 8px 0 12px;
+    }
+
+    .help-card a {
+      font-size: 11px;
+      color: #b69aff;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px 32px 38px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .crumb {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 25px;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: -.5px;
+    }
+
+    .welcome {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 39px;
+      height: 39px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #d9d8f4;
+      cursor: pointer;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 11px 6px 6px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #a78bfa, #4c1d95);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .profile strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .profile small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 15px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 28px;
+    }
+
+    .stat {
+      padding: 19px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(145deg, #141421, #0e0e18);
+      min-width: 0;
+    }
+
+    .stat-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .stat-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #8b5cf620;
+      color: #c4b5fd;
+      font-size: 17px;
+    }
+
+    .stat-value {
+      font-size: 25px;
+      font-weight: 600;
+      margin: 17px 0 8px;
+    }
+
+    .stat-foot {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .accent {
+      color: #c4b5fd;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, .8fr);
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-head h2 {
+      font-size: 14px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .panel-head p {
+      font-size: 10px;
+      color: var(--muted);
+      margin: 6px 0 0;
+    }
+
+    .select {
+      background: #171725;
+      color: #c9cce1;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      outline: none;
+    }
+
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 11px;
+    }
+
+    .table-card {
+      border: 1px solid #35314b;
+      background: #141421;
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .table-card:before {
+      content: "";
+      position: absolute;
+      right: -20px;
+      top: -25px;
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: #8b5cf610;
+    }
+
+    .table-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-top strong {
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      display: inline-block;
+      border-radius: 50%;
+      margin-right: 5px;
+      background: #a78bfa;
+    }
+
+    .dot.busy {
+      background: #fb7185;
+    }
+
+    .dot.free {
+      background: #a78bfa;
+    }
+
+    .status {
+      font-size: 9px;
+      color: #c4b5fd;
+    }
+
+    .status.busy {
+      color: #fda4af;
+    }
+
+    .table-art {
+      height: 65px;
+      margin: 14px 0 10px;
+      border: 4px solid #49415f;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #292040, #171526);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .table-art:before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid #8973ad;
+      border-radius: 3px;
+    }
+
+    .balls {
+      display: flex;
+      gap: 6px;
+      z-index: 1;
+    }
+
+    .ball {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #a78bfa;
+      box-shadow: inset -3px -3px 4px #0008;
+    }
+
+    .ball:nth-child(2) {
+      background: #f4f0ff;
+    }
+
+    .ball:nth-child(3) {
+      background: #7c3aed;
+    }
+
+    .table-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .table-meta b {
+      font-size: 10px;
+      color: #e8e5ff;
+      font-weight: 500;
+    }
+
+    .panel-link {
+      border: 0;
+      background: transparent;
+      color: #b69aff;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .orders {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .order {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 13px 0;
+      border-bottom: 1px solid #28273a;
+    }
+
+    .order:last-child {
+      border-bottom: 0;
+    }
+
+    .food-icon {
+      width: 39px;
+      height: 39px;
+      border-radius: 11px;
+      background: #8b5cf61c;
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+    }
+
+    .order-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-info strong {
+      font-size: 11px;
+      display: block;
+    }
+
+    .order-info small {
+      font-size: 10px;
+      color: var(--muted);
+      display: block;
+      margin-top: 5px;
+    }
+
+    .order-price {
+      font-size: 10px;
+      color: #e6e3fa;
+      white-space: nowrap;
+    }
+
+    .badge {
+      font-size: 9px;
+      padding: 5px 7px;
+      border-radius: 6px;
+      background: #8b5cf620;
+      color: #c4b5fd;
+      display: inline-block;
+      margin-top: 6px;
+    }
+
+    .badge.wait {
+      background: #fbbf2415;
+      color: #fcd34d;
+    }
+
+    .transactions {
+      margin-top: 18px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      white-space: nowrap;
+    }
+
+    th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      color: #8389a7;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      font-size: 11px;
+      color: #d8d9eb;
+      padding: 14px 10px;
+      border-bottom: 1px solid #242337;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .paid {
+      color: #c4b5fd;
+      background: #8b5cf61c;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 9px;
+    }
+
+    .empty-note {
+      color: var(--muted);
+      font-size: 12px;
+      padding: 20px 0;
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #171326;
+      border: 1px solid #8b5cf6;
+      color: #e9ddff;
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      box-shadow: 0 10px 35px #0008;
+      display: none;
+      z-index: 10;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    /* Gaya Tombol Logout */
+    .logout-form {
+      width: 100%;
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(251, 113, 133, 0.08);
+      border: 1px solid rgba(251, 113, 133, 0.25);
+      border-radius: 10px;
+      color: #fb7185;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(251, 113, 133, 0.2);
+      border-color: #fb7185;
+      color: #ffe4e6;
+    }
+
+    .btn-logout .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body data-user-name="{{ nama }}" data-user-role="{{ role }}">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">FJ</div>
+        <div><strong>FJ BILLIARD</strong><small>MANAGEMENT SYSTEM</small></div>
+      </div>
+      <div>
+        <div class="nav-label">MENU UTAMA</div>
+        <nav class="nav" aria-label="Navigasi utama">
+          <a href="/dashboard"><button class="active"><span class="nav-icon">▦</span>Dashboard</button></a>
+          <a href="/meja"><button><span class="nav-icon">▤</span>Meja Billiard</button></a>
+          <a href="/booking"><button><span class="nav-icon">▣</span>Booking</button></a>
+          <a href="/pesanan"><button><span class="nav-icon">♨</span>Pesanan</button></a>
+          <a href="/transaksi"><button><span class="nav-icon">↗</span>Transaksi</button></a>
+          <a href="/menu"><button><span class="nav-icon">☷</span>Menu Makanan</button></a>
+        </nav>
+      </div>
+
+      <div class="side-bottom">
+        <div class="help-card">
+          <strong>Butuh bantuan?</strong>
+          <p>Kelola operasional FJ BILLIARD dengan lebih mudah.</p>
+          <a href="#" id="helpLink">Hubungi administrator →</a>
+        </div>
+
+        <!-- TOMBOL LOGOUT -->
+        <form action="/logout" method="POST" class="logout-form">
+          <button type="submit" class="btn-logout">
+            <span class="nav-icon">⎋</span>
+            <span>Keluar / Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="crumb">FJ BILLIARD / <span class="accent">overview</span></div>
+          <h1 id="pageTitle">HOME</h1>
+          <p class="welcome">Selamat datang, <strong id="userName">{{ nama }}</strong>.</p>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="notificationButton" title="Notifikasi">♧</button>
+          <div class="profile">
+            <div class="avatar" id="avatar">PG</div>
+            <div><strong id="profileName">{{ nama }}</strong><small id="profileRole">{{ role | capitalize }}</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section>
+        <h2 class="section-title">Ringkasan Hari Ini</h2>
+        <div class="stats">
+          <article class="stat">
+            <div class="stat-head">Meja Terpakai <span class="stat-icon">▤</span></div>
+            <div class="stat-value">{{ active_tables_count }} <span style="font-size:13px;color:#7c819d">/ {{
+                total_tables }}</span></div>
+            <div class="stat-foot"><span class="accent">Sistem Aktif</span> database terhubung</div>
+          </article>
+          <article class="stat">
+            <div class="stat-head">Booking Hari Ini <span class="stat-icon">▣</span></div>
+            <div class="stat-value">0</div>
+            <div class="stat-foot">Jadwal reservasi</div>
+          </article>
+          <article class="stat">
+            <div class="stat-head">Pesanan Aktif <span class="stat-icon">♨</span></div>
+            <div class="stat-value">{{ recent_orders | length }}</div>
+            <div class="stat-foot">Pesanan tercatat</div>
+          </article>
+          <article class="stat">
+            <div class="stat-head">Pendapatan Hari Ini <span class="stat-icon">↗</span></div>
+            <div class="stat-value">0</div>
+            <div class="stat-foot">Data real-time</div>
+          </article>
+        </div>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Ringkasan Meja</h2>
+              <p>Menampilkan meja teratas</p>
+            </div>
+            <a href="/meja" class="panel-link">Lihat Semua Meja →</a>
+          </div>
+          <div class="table-grid" id="tableGrid">
+            {% for table in tables[:6] %}
+            <article class="table-card" data-status="{{ 'busy' if not table['is_active'] else 'free' }}">
+              <div class="table-top">
+                <strong>Meja {{ table['table_number'] }}</strong>
+                <span class="status {{ 'busy' if not table['is_active'] else '' }}">
+                  <i class="dot {{ 'busy' if not table['is_active'] else 'free' }}"></i>
+                  {{ 'Nonaktif' if not table['is_active'] else 'Tersedia' }}
+                </span>
+              </div>
+              <div class="table-art">
+                <div class="balls"><i class="ball"></i><i class="ball"></i><i class="ball"></i></div>
+              </div>
+              <div class="table-meta"><span>Status</span><b>{{ 'Maintenance' if not table['is_active'] else 'Kosong'
+                  }}</b></div>
+            </article>
+            {% else %}
+            <p class="empty-note" style="display:block;">Belum ada meja terdaftar.</p>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Pesanan Terbaru</h2>
+              <p>Ringkasan pesanan makanan dan minuman</p>
+            </div>
+          </div>
+          <div class="orders">
+            {% for order in recent_orders %}
+            <div class="order">
+              <div class="food-icon">♨</div>
+              <div class="order-info">
+                <strong>{{ order['order_number'] }}</strong>
+                <small>{{ order['customer_name'] }}</small>
+                <span class="badge {{ 'wait' if order['status'] == 'awaiting_payment' else '' }}">{{ order['status']
+                  }}</span>
+              </div>
+              <div class="order-price">Rp {{ "{:,}".format(order['total_price'] or 0).replace(',', '.') }}</div>
+            </div>
+            {% else %}
+            <p class="empty-note" style="display:block;">Belum ada pesanan terbaru.</p>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+
+      <section class="panel transactions">
+        <div class="panel-head">
+          <div>
+            <h2>Transaksi Terbaru</h2>
+            <p>Daftar transaksi pembayaran langsung dari database</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>KODE TRANSAKSI</th>
+                <th>PELANGGAN</th>
+                <th>DETAIL</th>
+                <th>METODE</th>
+                <th>TOTAL</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for trx in recent_transactions %}
+              <tr>
+                <td>{{ trx['payment_code'] }}</td>
+                <td>{{ trx['customer_name'] }}</td>
+                <td>Pembayaran Billiard</td>
+                <td>{{ trx['method'] | upper }}</td>
+                <td>Rp {{ "{:,}".format(trx['amount']).replace(',', '.') }}</td>
+                <td><span class="paid">{{ trx['status'] }}</span></td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--muted);">Belum ada riwayat transaksi.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const userName = document.body.dataset.userName || 'Pengguna';
+    const userRole = document.body.dataset.userRole || 'member';
+    document.getElementById('userName').textContent = userName;
+    document.getElementById('profileName').textContent = userName;
+    document.getElementById('profileRole').textContent =
+      userRole.charAt(0).toUpperCase() + userRole.slice(1);
+    document.getElementById('avatar').textContent =
+      userName.split(/\s+/).map(part => part[0] || '').join('').slice(0, 2).toUpperCase();
+
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    document.querySelectorAll('[data-section]').forEach(button => {
+      button.addEventListener('click', () => {
+        const section = button.dataset.section;
+        showToast('Menu "' + section + '" dipilih. Halaman fitur ini perlu diintegrasikan.');
+      });
+    });
+
+    document.getElementById('notificationButton').addEventListener('click', () => {
+      showToast('Belum ada notifikasi baru.');
+    });
+    document.getElementById('helpLink').addEventListener('click', event => {
+      event.preventDefault();
+      showToast('Silakan hubungi administrator FJ BILLIARD.');
+    });
+  </script>
+</body>
+
+</html>

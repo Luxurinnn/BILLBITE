@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | FJ BILLIARD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="page">
+
+        <header class="topbar">
+            <div class="brand">FJ BILLIARD</div>
+            <div class="tagline">Premium Billiard Experience</div>
+        </header>
+
+        <section class="intro">
+            <div class="logo">
+                <div class="logo-symbol">FJ</div>
+                <div class="logo-name">BILLIARD</div>
+            </div>
+
+            <div class="eyebrow">PLAY / RELAX / CONNECT</div>
+
+            <h1>
+                Lebih dari sekadar permainan,<br>
+                ini tentang <span>momen.</span>
+            </h1>
+
+            <p>
+                Nikmati pengalaman bermain billiard terbaik<br>
+                bersama FJ BILLIARD.
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">♧</div>
+                    <strong>Meja Premium</strong>
+                    <small>Standar Internasional</small>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">♨</div>
+                    <strong>Food &amp; Beverage</strong>
+                    <small>Rasa Terbaik</small>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">♙</div>
+                    <strong>Suasana Nyaman</strong>
+                    <small>Untuk Semua</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-card">
+
+            <div class="card-logo">
+                <div class="logo">
+                    <div class="logo-symbol">FJ</div>
+                    <div class="logo-name">BILLIARD</div>
+                </div>
+            </div>
+
+            <h2>Selamat <span>Datang</span></h2>
+
+            <p class="subtitle">
+                Masuk untuk melanjutkan pengalaman<br>
+                bermain di FJ Billiard.
+            </p>
+
+            <form action="/" method="POST" id="loginForm">
+
+                <label class="input-group">
+                    <span class="input-icon">✉</span>
+                    <input type="email" name="email" placeholder="Email" autocomplete="username" required>
+                </label>
+
+                <label class="input-group">
+                    <span class="input-icon">♙</span>
+                    <input type="password" name="password" id="password" placeholder="Password"
+                        autocomplete="current-password" required>
+                    <button class="toggle-password" type="button" id="togglePassword"
+                        aria-label="Tampilkan password">◎</button>
+                </label>
+
+                <div class="forgot">
+                    <span>Lupa password?</span>
+                    <a href="#" id="resetLink">Reset password</a>
+                </div>
+
+                {% if error %}
+                <div class="error-message">{{ error }}</div>
+                {% endif %}
+
+                <button class="login-button" type="submit">
+                    Masuk &nbsp; ⟶
+                </button>
+            </form>
+
+            <div class="divider">Belum punya akun?</div>
+
+            <a class="register-button" href="/register">
+                <span>♙</span>
+                Daftar sekarang
+                <span>⟶</span>
+            </a>
+
+            <div class="secure">
+                <span>♙</span>
+                Akun Anda aman bersama kami
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const password = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", function () {
+            if (password.type === "password") {
+                password.type = "text";
+                togglePassword.textContent = "◉";
+                togglePassword.setAttribute(
+                    "aria-label", "Sembunyikan password"
+                );
+            } else {
+                password.type = "password";
+                togglePassword.textContent = "◎";
+                togglePassword.setAttribute(
+                    "aria-label", "Tampilkan password"
+                );
+            }
+        });
+
+        document.getElementById("resetLink").addEventListener("click", function (event) {
+            event.preventDefault();
+            const emailInput = document.querySelector("input[name='email']");
+            const email = emailInput ? emailInput.value.trim() : "";
+
+            if (!email) {
+                alert("Silakan masukkan alamat email Anda terlebih dahulu pada kolom email di atas.");
+                if (emailInput) emailInput.focus();
+                return;
+            }
+
+            alert("Instruksi pemulihan password telah disimulasikan terkirim ke email: " + email);
+        });
+    </script>
+</body>
+
+</html>

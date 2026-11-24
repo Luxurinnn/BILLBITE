@@ -334,6 +334,63 @@
             text-align: center;
         }
 
+        .flash-message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border: 1px solid #8b5cf644;
+            border-radius: 9px;
+            background: #8b5cf61c;
+            color: #ddd1ff;
+            font-size: 12px;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+
+        .booking-form label {
+            display: grid;
+            gap: 7px;
+            color: #aeb3ce;
+            font-size: 11px;
+        }
+
+        .booking-form input,
+        .booking-form select {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--panel2);
+            color: var(--text);
+        }
+
+        .booking-form button {
+            min-height: 40px;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--purple2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .booking-form button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 760px) {
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .toast {
             position: fixed;
             bottom: 24px;
@@ -385,10 +442,9 @@
             font-size: 16px;
         }
     </style>
-    <link rel="stylesheet" href="{{ url_for('static', filename='billiard-theme.css') }}">
 </head>
 
-<body class="booking-page" data-user-name="{{ nama }}" data-user-role="{{ role }}">
+<body data-user-name="{{ nama }}" data-user-role="{{ role }}">
     <div class="layout">
         <aside class="sidebar">
             <div class="brand">
@@ -440,19 +496,44 @@
                 </div>
             </header>
 
-            <section class="booking-overview" aria-label="Ringkasan booking">
-                <div class="overview-copy">
-                    <span class="overview-eyebrow"><span class="overview-dot"></span> PUSAT RESERVASI</span>
-                    <h2>Semua jadwal, <span>dalam kendali.</span></h2>
-                    <p>Pantau reservasi meja dan waktu bermain pelanggan dengan mudah.</p>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash-message" role="status">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <section class="panel" style="margin-bottom: 20px;">
+                <div class="panel-head">
+                    <div>
+                        <h2>Buat Booking</h2>
+                        <p>Pilih meja dan waktu bermain yang Anda inginkan.</p>
+                    </div>
                 </div>
-                <div class="overview-count">
-                    <span>Total reservasi</span>
-                    <strong>{{ bookings | length }}</strong>
-                    <small>jadwal tercatat</small>
-                </div>
-                <div class="overview-orb overview-orb-one"></div>
-                <div class="overview-orb overview-orb-two"></div>
+                <form class="booking-form" action="{{ url_for('booking_page') }}" method="POST">
+                    <label for="table_id">
+                        Meja
+                        <select id="table_id" name="table_id" required>
+                            <option value="">Pilih meja</option>
+                            {% for table in tables %}
+                            <option value="{{ table['id'] }}">Meja {{ table['table_number'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label for="start_at">
+                        Waktu mulai
+                        <input id="start_at" name="start_at" type="datetime-local" required>
+                    </label>
+                    <label for="duration">
+                        Durasi (jam)
+                        <input id="duration" name="duration" type="number" min="1" step="1" value="1" required>
+                    </label>
+                    <button type="submit" {% if not tables %}disabled{% endif %}>Booking Sekarang</button>
+                </form>
+                {% if not tables %}
+                <p class="empty-note">Belum ada meja aktif yang tersedia untuk booking.</p>
+                {% endif %}
             </section>
 
             <section class="panel">
@@ -461,7 +542,6 @@
                         <h2>Daftar Reservasi Aktif</h2>
                         <p>Jadwal pemesanan meja dari pelanggan</p>
                     </div>
-                    <span class="booking-count">{{ bookings | length }} booking</span>
                 </div>
                 <div class="table-wrap">
                     <table>

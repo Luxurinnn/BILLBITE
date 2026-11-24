@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun | FJ BILLIARD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="register-card">
+        <h2>Buat Akun <span>Baru</span></h2>
+        <p class="subtitle">Daftar untuk mulai memesan meja dan menikmati fasilitas FJ Billiard.</p>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="error-message">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="/register" method="POST">
+            <div class="input-group">
+                <input type="text" name="full_name" placeholder="Nama Lengkap" required>
+            </div>
+            <div class="input-group">
+                <input type="email" name="email" placeholder="Alamat Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button class="btn" type="submit">Daftar Sekarang</button>
+        </form>
+
+        <a class="back-link" href="/">← Sudah punya akun? Masuk</a>
+    </div>
+</body>
+
+</html>

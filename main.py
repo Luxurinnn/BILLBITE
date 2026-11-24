@@ -1,6 +1,8 @@
 import os
+import secrets
 import sqlite3
 from pathlib import Path
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import (
@@ -220,13 +222,116 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-@app.route('/booking')
+@app.route('/booking', methods=["GET", "POST"])
 @login_required
 def booking_page():
     conn = get_db()
     try:
-        # Ambil data booking jika tabelnya sudah ada, atau kosongkan
+        tables = conn.execute(
+            """
+            SELECT id, table_number
+            FROM billiard_tables
+            WHERE is_active = 1
+            ORDER BY table_number
+            """
+        ).fetchall()
+
+        if request.method == "POST":
+            try:
+                table_id = int(request.form.get("table_id", ""))
+                duration = int(request.form.get("duration", ""))
+                start_at = datetime.fromisoformat(
+                    request.form.get("start_at", "").strip()
+                )
+            except (TypeError, ValueError):
+                flash("Pilih meja, waktu mulai, dan durasi booking yang valid.")
+                return redirect(url_for("booking_page"))
+
+            if duration < 1:
+                flash("Durasi booking minimal 1 jam.")
+                return redirect(url_for("booking_page"))
+            if start_at.tzinfo is not None:
+                flash("Waktu booking harus menggunakan waktu lokal.")
+                return redirect(url_for("booking_page"))
+            if start_at <= datetime.now():
+                flash("Waktu booking harus lebih dari waktu sekarang.")
+                return redirect(url_for("booking_page"))
+
+            try:
+                end_at = start_at + timedelta(hours=duration)
+            except OverflowError:
+                flash("Durasi booking tidak valid.")
+                return redirect(url_for("booking_page"))
+            start_value = start_at.strftime("%Y-%m-%d %H:%M:%S")
+            end_value = end_at.strftime("%Y-%m-%d %H:%M:%S")
+
+            conn.execute("BEGIN IMMEDIATE")
+            table = conn.execute(
+                """
+                SELECT id FROM billiard_tables
+                WHERE id = ? AND is_active = 1
+                """,
+                (table_id,)
+            ).fetchone()
+            if table is None:
+                conn.rollback()
+                flash("Meja yang dipilih tidak tersedia.")
+                return redirect(url_for("booking_page"))
+
+            conflict = conn.execute(
+                """
+                SELECT 1 FROM bookings
+                WHERE table_id = ?
+                  AND status IN ('pending', 'confirmed')
+                  AND start_at < ?
+                  AND end_at > ?
+                LIMIT 1
+                """,
+                (table_id, end_value, start_value)
+            ).fetchone()
+            if conflict:
+                conn.rollback()
+                flash("Meja sudah dibooking pada waktu tersebut. Silakan pilih waktu lain.")
+                return redirect(url_for("booking_page"))
+
+            conn.execute(
+                """
+                INSERT INTO bookings (
+                    booking_code, customer_id, table_id, start_at, end_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    f"BK{secrets.token_hex(4).upper()}",
+                    session["user_id"],
+                    table_id,
+                    start_value,
+                    end_value
+                )
+            )
+            conn.commit()
+            flash("Booking berhasil dibuat.")
+            return redirect(url_for("booking_page"))
+
+        booking_rows = conn.execute(
+            """
+            SELECT b.booking_code, u.full_name AS customer_name,
+                   t.table_number, b.start_at, b.end_at, b.status
+            FROM bookings b
+            JOIN users u ON u.id = b.customer_id
+            JOIN billiard_tables t ON t.id = b.table_id
+            WHERE b.status IN ('pending', 'confirmed')
+            ORDER BY b.start_at
+            """
+        ).fetchall()
         bookings = []
+        for booking in booking_rows:
+            item = dict(booking)
+            start = datetime.fromisoformat(item["start_at"])
+            end = datetime.fromisoformat(item["end_at"])
+            item["start_time"] = start.strftime("%d-%m-%Y %H:%M")
+            item["duration"] = int((end - start).total_seconds() // 3600)
+            bookings.append(item)
     finally:
         conn.close()
     
@@ -234,7 +339,8 @@ def booking_page():
         'booking.html', 
         nama=session.get("full_name", "Pengguna"), 
         role=session.get("role", "member"), 
-        bookings=bookings
+        bookings=bookings,
+        tables=tables
     )
 
 @app.route('/pesanan')
