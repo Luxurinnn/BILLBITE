@@ -11,7 +11,9 @@
         :root {
             --bg: #080811;
             --panel: #10101c;
+            --panel2: #141421;
             --border: #29283e;
+            --purple2: #5c2bd8;
             --text: #f0efff;
             --muted: #969bb8;
         }
@@ -26,6 +28,11 @@
             background: var(--bg);
             color: var(--text);
             font-family: 'Inter', Arial, sans-serif;
+        }
+
+        button,
+        input {
+            font: inherit;
         }
 
         a {
@@ -235,6 +242,41 @@
             padding: 30px 0;
             text-align: center;
         }
+
+        .flash-message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border: 1px solid #8b5cf644;
+            border-radius: 9px;
+            background: #8b5cf61c;
+            color: #ddd1ff;
+            font-size: 12px;
+        }
+
+        .order-quantity {
+            width: 76px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--panel2);
+            color: var(--text);
+        }
+
+        .order-submit {
+            margin-top: 16px;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--purple2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .order-submit:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -263,49 +305,68 @@
                 <div>
                     <div class="crumb">FJ BILLIARD / Menu Makanan</div>
                     <h1>Menu Makanan & Minuman</h1>
-                    <p class="welcome">Daftar item hidangan yang tersedia.</p>
+                    <p class="welcome">Pilih jumlah item lalu kirim pesanan Anda.</p>
                 </div>
             </header>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash-message" role="status">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
 
             <section class="panel">
                 <div class="panel-head">
                     <h2>Katalog Menu</h2>
-                    <p>Daftar produk dan ketersediaan stok</p>
+                    <p>Pesanan baru akan tercatat dengan status menunggu pembayaran.</p>
                 </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NAMA MENU</th>
-                                <th>KATEGORI</th>
-                                <th>HARGA</th>
-                                <th>STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if menu_items %}
-                            {% for item in menu_items %}
-                            <tr>
-                                <td><strong>{{ item['name'] }}</strong></td>
-                                <td>{{ item['category'] }}</td>
-                                <td>Rp {{ "{:,}".format(item['price'] or 0).replace(',', '.') }}</td>
-                                <td>
-                                    <span class="badge {{ 'out' if not item['is_available'] else '' }}">
-                                        {{ 'Tersedia' if item['is_available'] else 'Habis' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="4">
-                                    <p class="empty-note">Belum ada item menu terdaftar.</p>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
+                <form action="{{ url_for('menu_makanan') }}" method="POST">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>NAMA MENU</th>
+                                    <th>KATEGORI</th>
+                                    <th>HARGA</th>
+                                    <th>STATUS</th>
+                                    <th>JUMLAH</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if menu_items %}
+                                {% for item in menu_items %}
+                                <tr>
+                                    <td><strong>{{ item['name'] }}</strong></td>
+                                    <td>{{ item['category'] }}</td>
+                                    <td>Rp {{ "{:,}".format(item['price'] or 0).replace(',', '.') }}</td>
+                                    <td>
+                                        <span class="badge {{ 'out' if not item['is_available'] else '' }}">
+                                            {{ 'Tersedia' if item['is_available'] else 'Habis' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <input class="order-quantity" type="number" min="0" step="1" value="0"
+                                            name="quantity_{{ item['id'] }}" aria-label="Jumlah {{ item['name'] }}"
+                                            {% if not item['is_available'] %}disabled{% endif %}>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">
+                                        <p class="empty-note">Belum ada item menu terdaftar.</p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="order-submit" type="submit" {% if not available_menu_count %}disabled{% endif %}>
+                        Kirim Pesanan
+                    </button>
+                </form>
             </section>
         </main>
     </div>

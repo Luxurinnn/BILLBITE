@@ -197,20 +197,88 @@ def meja_billiard():
     )
 
 
-@app.route("/menu")
+@app.route("/menu", methods=["GET", "POST"])
 @login_required
 def menu_makanan():
     conn = get_db()
     try:
+        if request.method == "POST":
+            conn.execute("BEGIN IMMEDIATE")
+            available_items = conn.execute(
+                """
+                SELECT id, name, price
+                FROM menu_items
+                WHERE is_available = 1
+                """
+            ).fetchall()
+            selected_items = []
+
+            try:
+                for item in available_items:
+                    quantity = int(
+                        request.form.get(f"quantity_{item['id']}", "0").strip()
+                    )
+                    if quantity < 0:
+                        raise ValueError
+                    if quantity:
+                        selected_items.append((item, quantity))
+            except ValueError:
+                conn.rollback()
+                flash("Jumlah pesanan harus berupa angka nol atau lebih.")
+                return redirect(url_for("menu_makanan"))
+
+            if not selected_items:
+                conn.rollback()
+                flash("Pilih minimal satu makanan atau minuman.")
+                return redirect(url_for("menu_makanan"))
+
+            try:
+                order_number = f"ORD{secrets.token_hex(5).upper()}"
+                cursor = conn.execute(
+                    """
+                    INSERT INTO orders (order_number, customer_id, status)
+                    VALUES (?, ?, 'awaiting_payment')
+                    """,
+                    (order_number, session["user_id"])
+                )
+                conn.executemany(
+                    """
+                    INSERT INTO order_items (
+                        order_id, menu_item_id, item_name, quantity, unit_price
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            cursor.lastrowid,
+                            item["id"],
+                            item["name"],
+                            quantity,
+                            item["price"]
+                        )
+                        for item, quantity in selected_items
+                    ]
+                )
+                conn.commit()
+            except (OverflowError, sqlite3.Error) as error:
+                conn.rollback()
+                flash(f"Pesanan gagal disimpan: {error}")
+                return redirect(url_for("menu_makanan"))
+
+            flash(f"Pesanan {order_number} berhasil dibuat dan menunggu pembayaran.")
+            return redirect(url_for("pesanan_page"))
+
         menu_items = conn.execute(
             "SELECT id, name, category, price, is_available FROM menu_items ORDER BY category, name"
         ).fetchall()
+        available_menu_count = sum(item["is_available"] for item in menu_items)
     finally:
         conn.close()
 
     return render_template(
         "menu.html",
         menu_items=menu_items,
+        available_menu_count=available_menu_count,
         nama=session.get("full_name", "Pengguna"),
         role=session.get("role", "member")
     )
@@ -352,6 +420,8 @@ def pesanan_page():
             """
             SELECT o.order_number, o.status, 
                    COALESCE(u.full_name, 'Pelanggan Umum') as customer_name,
+                   (SELECT GROUP_CONCAT(item_name || ' x' || quantity, ', ')
+                    FROM order_items WHERE order_id = o.id) as items,
                    (SELECT SUM(quantity * unit_price) FROM order_items WHERE order_id = o.id) as total_price
             FROM orders o
             LEFT JOIN users u ON o.customer_id = u.id

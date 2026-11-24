@@ -339,6 +339,16 @@
             text-align: center;
         }
 
+        .flash-message {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border: 1px solid #8b5cf644;
+            border-radius: 9px;
+            background: #8b5cf61c;
+            color: #ddd1ff;
+            font-size: 12px;
+        }
+
         .toast {
             position: fixed;
             bottom: 24px;
@@ -444,6 +454,14 @@
                 </div>
             </header>
 
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash-message" role="status">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
             <section class="panel">
                 <div class="panel-head">
                     <div>
@@ -457,6 +475,7 @@
                             <tr>
                                 <th>KODE PESANAN</th>
                                 <th>PELANGGAN</th>
+                                <th>ITEM PESANAN</th>
                                 <th>TOTAL HARGA</th>
                                 <th>STATUS</th>
                             </tr>
@@ -467,6 +486,7 @@
                             <tr>
                                 <td>{{ order['order_number'] }}</td>
                                 <td>{{ order['customer_name'] }}</td>
+                                <td>{{ order['items'] or '-' }}</td>
                                 <td>Rp {{ "{:,}".format(order['total_price'] or 0).replace(',', '.') }}</td>
                                 <td><span class="badge {{ 'wait' if order['status'] == 'awaiting_payment' else '' }}">{{
                                         order['status'] }}</span></td>
@@ -474,7 +494,7 @@
                             {% endfor %}
                             {% else %}
                             <tr>
-                                <td colspan="4">
+                                <td colspan="5">
                                     <p class="empty-note">Belum ada pesanan makanan atau minuman tercatat.</p>
                                 </td>
                             </tr>
